@@ -16,6 +16,6 @@ func main() {
 	}
 	fmt.Println(len(tweets))
 	for _, im := range tweets {
-		fmt.Println(im.User.ScreenName, im.ID)
+		fmt.Println(im.User.ScreenName, im.ID, im.RetweetCount)
 	}
 }
