@@ -14,6 +14,6 @@ func main() {
 	}
 	fmt.Println(len(images))
 	for _, im := range images {
-		fmt.Println(im.Standard.Url)
+		fmt.Println(im.Thumb.Url)
 	}
 }
