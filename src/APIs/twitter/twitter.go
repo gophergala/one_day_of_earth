@@ -28,10 +28,11 @@ type Tweet struct {
 	HashTags     []string
 }
 
-func api_call(api_url string, query url.Values) (resp *twittergo.APIResponse, err error) {
+func api_call(api_url string, query string, next bool) (resp *twittergo.APIResponse, err error) {
 	var (
 		client *twittergo.Client
 		req    *http.Request
+		url    string
 	)
 	auth_config := &oauth1a.ClientConfig{
 		ConsumerKey:    config.TWEETER_CONSUMER_KEY,
@@ -39,8 +40,12 @@ func api_call(api_url string, query url.Values) (resp *twittergo.APIResponse, er
 	}
 	user := oauth1a.NewAuthorizedConfig(config.TWEETER_ACCESS_TOKEN, config.TWEETER_ACCESS_TOKEN_SECRET)
 	client = twittergo.NewClient(auth_config, user)
-
-	url := fmt.Sprintf("%s?%v", api_url, query.Encode())
+	if next {
+		url = fmt.Sprintf("%s%v", api_url, query)
+	} else {
+		url = fmt.Sprintf("%s?%v", api_url, query)
+	}
+	fmt.Println(url)
 	req, err = http.NewRequest("GET", url, nil)
 	if err != nil {
 		return
@@ -49,7 +54,7 @@ func api_call(api_url string, query url.Values) (resp *twittergo.APIResponse, er
 	return
 }
 
-func ParseTweets(resp *twittergo.APIResponse) (tweets []Tweet, cerr *lib.CError) {
+func ParseTweets(resp *twittergo.APIResponse) (tweets []Tweet, cerr *lib.CError, next_url string) {
 	content, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		cerr = &lib.CError{}
@@ -88,26 +93,54 @@ func ParseTweets(resp *twittergo.APIResponse) (tweets []Tweet, cerr *lib.CError)
 		}
 		tweets = append(tweets, tweet)
 	}
+	meta := st["search_metadata"].(map[string]interface{})
+	if meta["next_results"] != nil {
+		next_url = meta["next_results"].(string)
+	} else {
+		next_url = ""
+	}
+
 	return
 }
 
-func SearchTweets(lat, lng, MinDate string, distance int) (tweets []Tweet, cerr *lib.CError) {
-	cerr = nil
+func NextUrl(next_url string) (tweets []Tweet) {
 	var (
 		err  error
 		resp *twittergo.APIResponse
+	)
+	resp, err = api_call("/1.1/search/tweets.json", next_url, true)
+	if err != nil {
+		return
+	}
+	tweets, cerr, nurl := ParseTweets(resp)
+	if cerr != nil && len(nurl) > 1 {
+		return
+	}
+	tweets = append(tweets, NextUrl(nurl)...)
+	return
+}
+
+func SearchTweets(lat, lng, MinDate string, distance int, recursive bool) (tweets []Tweet, cerr *lib.CError) {
+	cerr = nil
+	var (
+		err      error
+		resp     *twittergo.APIResponse
+		next_url string
 	)
 	query := url.Values{}
 	query.Set("q", "")
 	query.Set("geocode", fmt.Sprintf("%s,%s,%skm", lat, lng, strconv.Itoa(distance)))
 	query.Set("since", MinDate)
 	query.Set("count", "100")
-	resp, err = api_call("/1.1/search/tweets.json", query)
+	resp, err = api_call("/1.1/search/tweets.json", query.Encode(), false)
 	if err != nil {
 		cerr = &lib.CError{}
 		cerr.SetMessage(err.Error())
 		return
 	}
-	tweets, cerr = ParseTweets(resp)
+	tweets, cerr, next_url = ParseTweets(resp)
+	if recursive && len(next_url) > 1 {
+		tweets = append(tweets, NextUrl(next_url)...)
+	}
 	return
 }

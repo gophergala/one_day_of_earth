@@ -14,4 +14,5 @@ package config
 //	TWEETER_CONSUMER_SECRET = "Tweeter Secret"
 //	TWEETER_ACCESS_TOKEN        = "Tocken"
 //	TWEETER_ACCESS_TOKEN_SECRET = "Secret"
+//	YOUTUBE_API_KEY             = "API KEY"
 //)

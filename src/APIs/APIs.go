@@ -30,7 +30,9 @@ type ApiImage struct {
 	Small     Image
 }
 
-//Private function only for this package, just for making REST API calls
+//Private function only for this package, just for making GET REST API calls
+//TODO: Need to Add Pagination for all API calls
+
 func API_call(method int, api_url string, params map[string]string) (ret_data interface{}, cerr *lib.CError) {
 	var (
 		resp *http.Response
