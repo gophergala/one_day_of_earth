@@ -31,6 +31,9 @@ func SearchImages(lat, lng string, minTimeStamp, distance int) (images []APIs.Ap
 	for _, img_interface := range i["data"].([]interface{}) {
 		insta_image := APIs.ApiImage{}
 		img := img_interface.(map[string]interface{})
+		if img["type"].(string) != "image" {
+			continue
+		}
 		insta_image.Id = img["id"].(string)
 		insta_image.Instalink = img["link"].(string)
 		imgs := img["images"].(map[string]interface{})
