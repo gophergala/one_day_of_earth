@@ -10,4 +10,8 @@ package config
 //
 //	INSTAGRAM_ACCESS_TOKEN = "INSTAGRAM ACCESS THOKEN"
 //	FLICKR_API_KEY         = "FLICKER API KEY"
+//	TWEETER_CONSUMER_KEY    = "Tweeter Key"
+//	TWEETER_CONSUMER_SECRET = "Tweeter Secret"
+//	TWEETER_ACCESS_TOKEN        = "Tocken"
+//	TWEETER_ACCESS_TOKEN_SECRET = "Secret"
 //)
