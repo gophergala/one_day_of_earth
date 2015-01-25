@@ -68,6 +68,11 @@ func ParseTweets(resp *twittergo.APIResponse) (tweets []Tweet, cerr *lib.CError,
 	}
 
 	st := req_data.(map[string]interface{})
+	if st["statuses"] == nil {
+		cerr = &lib.CError{}
+		cerr.SetMessage("Tweets Not found")
+		return
+	}
 	for _, t := range st["statuses"].([]interface{}) {
 		tv := t.(map[string]interface{})
 		tweet := Tweet{

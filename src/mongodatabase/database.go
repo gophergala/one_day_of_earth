@@ -6,7 +6,6 @@ import (
 	"config"
 	//	"fmt"
 	"gopkg.in/mgo.v2"
-	//	"gopkg.in/mgo.v2/bson"
 )
 
 type Mongo struct {
@@ -20,14 +19,20 @@ func (m *Mongo) Connect() (err error) {
 	if err != nil {
 		return
 	}
-	m.Session.SetMode(mgo.Monotonic, true)
+	m.Session.SetSafe(&mgo.Safe{})
 	m.DB = m.Session.DB(config.MONGO_DATABASE)
 	return
 }
 
-func (m *Mongo) Insert(collection string, docs ...interface{}) (err error) {
+func (m *Mongo) Insert(collection string, doc interface{}) (err error) {
 	c := m.DB.C(collection)
-	err = c.Insert(docs)
+	err = c.Insert(doc)
+	return
+}
+
+func (m *Mongo) Update(collection string, conditions map[string]interface{}, doc interface{}) (err error) {
+	c := m.DB.C(collection)
+	err = c.Update(conditions, doc)
 	return
 }
 
@@ -38,4 +43,13 @@ func (m *Mongo) Find(collection string, conditions map[string]interface{}) *mgo.
 
 func (m *Mongo) CloseConnection() {
 	m.Session.Close()
+}
+
+func (m *Mongo) FindOne(collection string, conditions map[string]interface{}, obj interface{}) (bool, error) {
+	query := m.Find(collection, conditions)
+	err := query.One(obj)
+	if err == mgo.ErrNotFound {
+		return false, nil
+	}
+	return true, err
 }

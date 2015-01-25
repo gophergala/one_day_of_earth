@@ -19,4 +19,8 @@ package config
 //MongoDB configs
 //MONGODB_CONNECTION = "mongodb://127.0.0.1/oneday" // Using IP address is match faster
 // MONGO_DATABASE     = "oneday"
+// 	TWITTER_CRON   = 0
+//YOUTUBE_CRON   = 1
+//INSTAGRAM_CRON = 2
+//FLICKR_CRON    = 3
 //)

@@ -2,6 +2,9 @@ package lib
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
+	"io"
 	"net/url"
 	"strings"
 	"time"
@@ -48,4 +51,13 @@ func UrlValues(params map[string]string) url.Values {
 func YesterdayTime() time.Time {
 	now := time.Now().UTC()
 	return time.Date(now.Year(), now.Month(), (now.Day() - 1), 0, 0, 0, 0, time.UTC)
+}
+
+func MD5strings(data ...string) string {
+	md := md5.New()
+	for _, s := range data {
+		io.WriteString(md, s)
+	}
+
+	return hex.EncodeToString(md.Sum(nil))
 }

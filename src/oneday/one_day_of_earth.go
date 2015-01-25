@@ -3,27 +3,50 @@ package main
 import (
 	//	"APIs/flickr"
 	//	"APIs/instagram"
-	"APIs/twitter"
+	//	"APIs/twitter"
 	//	"APIs/youtube"
+	"config"
+	"cronTask"
 	"fmt"
-	//	"strconv"
 	"lib"
-	//	"time"
-	"mongodatabase"
+	"strconv"
+	"time"
+	//	"mongodatabase"
 )
 
 func main() {
-	tweets, err := twitter.SearchTweets("37.7624499", "-122.4602593", lib.YesterdayTime().Format("2006-01-02"), 1000, true)
+	var err *lib.CError
+	err = cronTask.RunCronTask(config.TWITTER_CRON, "37.7624499", "-122.4602593", lib.YesterdayTime().Format("2006-01-02"), "1000")
+
 	if err != nil {
 		fmt.Println(err.Message())
+	} else {
+		fmt.Println("Twitter Done")
 	}
-	m := mongodatabase.Mongo{}
-	m.Connect()
-	fmt.Println(len(tweets))
-	for _, im := range tweets {
-		fmt.Println(im.User.ScreenName, im.ID, im.RetweetCount)
+
+	err = cronTask.RunCronTask(config.YOUTUBE_CRON, "37.7624499", "-122.4602593", lib.YesterdayTime().Format(time.RFC3339), "1000")
+
+	if err != nil {
+		fmt.Println(err.Message())
+	} else {
+		fmt.Println("Youtube Done")
 	}
-	m.Insert("twitter", tweets)
+
+	err = cronTask.RunCronTask(config.INSTAGRAM_CRON, "37.7624499", "-122.4602593", strconv.Itoa(lib.YesterdayTime().Second()), "5000")
+
+	if err != nil {
+		fmt.Println(err.Message())
+	} else {
+		fmt.Println("Instagram Done")
+	}
+
+	err = cronTask.RunCronTask(config.FLICKR_CRON, "37.7624499", "-122.4602593", lib.YesterdayTime().Format("2006-01-02"), "20")
+
+	if err != nil {
+		fmt.Println(err.Message())
+	} else {
+		fmt.Println("Flickr Done")
+	}
 
 	//	videos, err := youtube.SearchVideos("37.7624499", "-122.4602593", lib.YesterdayTime().Format(time.RFC3339), 1000, true, "")
 	//	if err != nil {

@@ -18,11 +18,11 @@ func SearchImages(lat, lng, minTimeStamp, distance string) (images []APIs.ApiIma
 		"lat":             lat,
 		"lon":             lng,
 		"min_upload_date": minTimeStamp,
-		"max_upload_date": minTimeStamp + 86000, // Flickr not filtering by time if there only min time
-		"radius":          distance,
-		"format":          "json",
-		"nojsoncallback":  "1",
-		"per_page":        "500",
+		//		"max_upload_date": minTimeStamp + 86000, // Flickr not filtering by time if there only min time
+		"radius":         distance,
+		"format":         "json",
+		"nojsoncallback": "1",
+		"per_page":       "500",
 	})
 	if cerr != nil {
 		return
