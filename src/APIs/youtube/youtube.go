@@ -5,7 +5,6 @@ import (
 	"config"
 	"fmt"
 	"lib"
-	"strconv"
 )
 
 type Video struct {
@@ -16,12 +15,12 @@ type Video struct {
 }
 
 //https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyD4DKmXQIeNUtqzsaKP3il8q6jK-bfa-C0&location=37.42307,-122.08427&locationRadius=100km&type=video&maxResults=50&publishedAfter=2015-01-23T00:00:00Z&order=rating
-func SearchVideos(lat, lng, datetime_RFC_3339 string, distance int, recursive bool, next_page_token string) (videos []Video, err *lib.CError) {
+func SearchVideos(lat, lng, datetime_RFC_3339, distance string, recursive bool, next_page_token string) (videos []Video, err *lib.CError) {
 	params := map[string]string{
 		"part":           "snippet",
 		"key":            config.YOUTUBE_API_KEY,
 		"location":       fmt.Sprintf("%s,%s", lat, lng),
-		"locationRadius": fmt.Sprintf("%skm", strconv.Itoa(distance)),
+		"locationRadius": fmt.Sprintf("%skm", distance),
 		"type":           "video",
 		"maxResults":     "50",
 		"minResults":     "50",

@@ -4,16 +4,15 @@ import (
 	"APIs"
 	"config"
 	"lib"
-	"strconv"
 )
 
-func SearchImages(lat, lng string, minTimeStamp, distance int) (images []APIs.ApiImage, cerr *lib.CError) {
+func SearchImages(lat, lng, minTimeStamp, distance string) (images []APIs.ApiImage, cerr *lib.CError) {
 	cerr = nil
 	data, cerr := APIs.API_call(config.GET, "https://api.instagram.com/v1/media/search", map[string]string{
 		"lat":           lat,
 		"lng":           lng,
-		"min_timestamp": strconv.Itoa(minTimeStamp),
-		"distance":      strconv.Itoa(distance),
+		"min_timestamp": minTimeStamp,
+		"distance":      distance,
 		"access_token":  config.INSTAGRAM_ACCESS_TOKEN,
 	})
 	if cerr != nil {

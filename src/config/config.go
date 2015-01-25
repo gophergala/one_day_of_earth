@@ -15,4 +15,8 @@ package config
 //	TWEETER_ACCESS_TOKEN        = "Tocken"
 //	TWEETER_ACCESS_TOKEN_SECRET = "Secret"
 //	YOUTUBE_API_KEY             = "API KEY"
+
+//MongoDB configs
+//MONGODB_CONNECTION = "mongodb://127.0.0.1/oneday" // Using IP address is match faster
+// MONGO_DATABASE     = "oneday"
 //)

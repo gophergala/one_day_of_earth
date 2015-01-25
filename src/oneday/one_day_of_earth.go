@@ -9,6 +9,7 @@ import (
 	//	"strconv"
 	"lib"
 	//	"time"
+	"mongodatabase"
 )
 
 func main() {
@@ -16,10 +17,13 @@ func main() {
 	if err != nil {
 		fmt.Println(err.Message())
 	}
+	m := mongodatabase.Mongo{}
+	m.Connect()
 	fmt.Println(len(tweets))
 	for _, im := range tweets {
 		fmt.Println(im.User.ScreenName, im.ID, im.RetweetCount)
 	}
+	m.Insert("twitter", tweets)
 
 	//	videos, err := youtube.SearchVideos("37.7624499", "-122.4602593", lib.YesterdayTime().Format(time.RFC3339), 1000, true, "")
 	//	if err != nil {

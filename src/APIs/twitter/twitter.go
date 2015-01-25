@@ -10,7 +10,6 @@ import (
 	"lib"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 type TweetUser struct {
@@ -119,7 +118,7 @@ func NextUrl(next_url string) (tweets []Tweet) {
 	return
 }
 
-func SearchTweets(lat, lng, MinDate string, distance int, recursive bool) (tweets []Tweet, cerr *lib.CError) {
+func SearchTweets(lat, lng, MinDate, distance string, recursive bool) (tweets []Tweet, cerr *lib.CError) {
 	cerr = nil
 	var (
 		err      error
@@ -128,7 +127,7 @@ func SearchTweets(lat, lng, MinDate string, distance int, recursive bool) (tweet
 	)
 	query := url.Values{}
 	query.Set("q", "")
-	query.Set("geocode", fmt.Sprintf("%s,%s,%skm", lat, lng, strconv.Itoa(distance)))
+	query.Set("geocode", fmt.Sprintf("%s,%s,%skm", lat, lng, distance))
 	query.Set("since", MinDate)
 	query.Set("count", "100")
 	resp, err = api_call("/1.1/search/tweets.json", query.Encode(), false)
