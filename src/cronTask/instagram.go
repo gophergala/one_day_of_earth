@@ -6,6 +6,7 @@ import (
 	"config"
 	"lib"
 	"mongodatabase"
+	"time"
 )
 
 func Instagram_Cron(lat, lng, date, distance string) (cerr *lib.CError) {
@@ -31,6 +32,25 @@ func Instagram_Cron(lat, lng, date, distance string) (cerr *lib.CError) {
 		return
 	}
 	if !found {
+		//CleanUP last Data
+		clean_data := make([]mongodatabase.FlickrCollection, 0)
+		q := m.Find(config.INSTAGRAM_DB_COLLECTION, map[string]interface{}{
+			"locationhash": lib.MD5strings(lat, lng),
+		})
+		q.Sort("createdate")
+		err := q.All(&clean_data)
+		if err != nil {
+			cerr = &lib.CError{}
+			cerr.SetMessage(err.Error())
+			return
+		}
+		if len(clean_data) > 2 {
+			m.Remove(config.INSTAGRAM_DB_COLLECTION, map[string]interface{}{
+				"index": clean_data[0].Index,
+			})
+		}
+
+		instagram_collection.CreateDate = time.Now().UTC()
 		instagram_collection.Index = index
 		instagram_collection.DateStr = date
 		instagram_collection.LocationHash = loc_hash

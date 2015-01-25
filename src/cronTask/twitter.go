@@ -5,6 +5,7 @@ import (
 	"config"
 	"lib"
 	"mongodatabase"
+	"time"
 )
 
 func Twitter_Cron(lat, lng, date, distance string) (cerr *lib.CError) {
@@ -30,6 +31,25 @@ func Twitter_Cron(lat, lng, date, distance string) (cerr *lib.CError) {
 		return
 	}
 	if !found {
+		//CleanUP last Data
+		clean_data := make([]mongodatabase.FlickrCollection, 0)
+		q := m.Find(config.TWITTER_DB_COLLECTION, map[string]interface{}{
+			"locationhash": lib.MD5strings(lat, lng),
+		})
+		q.Sort("createdate")
+		err := q.All(&clean_data)
+		if err != nil {
+			cerr = &lib.CError{}
+			cerr.SetMessage(err.Error())
+			return
+		}
+		if len(clean_data) > 2 {
+			m.Remove(config.TWITTER_DB_COLLECTION, map[string]interface{}{
+				"index": clean_data[0].Index,
+			})
+		}
+
+		twitter_collection.CreateDate = time.Now().UTC()
 		twitter_collection.Index = index
 		twitter_collection.DateStr = date
 		twitter_collection.LocationHash = loc_hash

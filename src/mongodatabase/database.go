@@ -30,6 +30,12 @@ func (m *Mongo) Insert(collection string, doc interface{}) (err error) {
 	return
 }
 
+func (m *Mongo) Remove(collection string, conditions map[string]interface{}) (err error) {
+	c := m.DB.C(collection)
+	err = c.Remove(conditions)
+	return
+}
+
 func (m *Mongo) Update(collection string, conditions map[string]interface{}, doc interface{}) (err error) {
 	c := m.DB.C(collection)
 	err = c.Update(conditions, doc)
@@ -48,6 +54,15 @@ func (m *Mongo) CloseConnection() {
 func (m *Mongo) FindOne(collection string, conditions map[string]interface{}, obj interface{}) (bool, error) {
 	query := m.Find(collection, conditions)
 	err := query.One(obj)
+	if err == mgo.ErrNotFound {
+		return false, nil
+	}
+	return true, err
+}
+
+func (m *Mongo) FindAll(collection string, conditions map[string]interface{}, obj interface{}) (bool, error) {
+	query := m.Find(collection, conditions)
+	err := query.All(obj)
 	if err == mgo.ErrNotFound {
 		return false, nil
 	}

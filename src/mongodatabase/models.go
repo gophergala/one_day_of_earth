@@ -4,6 +4,7 @@ import (
 	"APIs"
 	"APIs/twitter"
 	"APIs/youtube"
+	"time"
 )
 
 type TwitterCollection struct {
@@ -11,6 +12,7 @@ type TwitterCollection struct {
 	LocationHash string //MD5 for lat, lng
 	DateStr      string //Date for compiring on 1 day period
 	Tweets       []twitter.Tweet
+	CreateDate   time.Time
 }
 
 type YoutubeCollection struct {
@@ -18,6 +20,7 @@ type YoutubeCollection struct {
 	LocationHash string //MD5 for lat, lng
 	DateStr      string //Date for compiring on 1 day period
 	Videos       []youtube.Video
+	CreateDate   time.Time
 }
 
 type InstagramCollection struct {
@@ -25,6 +28,7 @@ type InstagramCollection struct {
 	LocationHash string //MD5 for lat, lng
 	DateStr      string //Date for compiring on 1 day period
 	Images       []APIs.ApiImage
+	CreateDate   time.Time
 }
 
 type FlickrCollection struct {
@@ -32,4 +36,5 @@ type FlickrCollection struct {
 	LocationHash string //MD5 for lat, lng
 	DateStr      string //Date for compiring on 1 day period
 	Images       []APIs.ApiImage
+	CreateDate   time.Time
 }
