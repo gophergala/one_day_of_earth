@@ -45,7 +45,6 @@ func api_call(api_url string, query string, next bool) (resp *twittergo.APIRespo
 	} else {
 		url = fmt.Sprintf("%s?%v", api_url, query)
 	}
-	fmt.Println(url)
 	req, err = http.NewRequest("GET", url, nil)
 	if err != nil {
 		return

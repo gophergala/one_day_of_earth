@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/url"
 	"strings"
+	"time"
 )
 
 type CError struct {
@@ -42,4 +43,9 @@ func UrlValues(params map[string]string) url.Values {
 		val.Add(k, v)
 	}
 	return val
+}
+
+func YesterdayTime() time.Time {
+	now := time.Now().UTC()
+	return time.Date(now.Year(), now.Month(), (now.Day() - 1), 0, 0, 0, 0, time.UTC)
 }
