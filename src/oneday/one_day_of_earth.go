@@ -12,12 +12,13 @@ import (
 	//	"strconv"
 	//	"time"
 	//	"mongodatabase"
+	"rest_server"
 )
 
 func main() {
 
-	cronTask.StartCron(10)
-
+	go cronTask.StartCron(10)
+	rest_server.StartServer()
 	//	videos, err := youtube.SearchVideos("37.7624499", "-122.4602593", lib.YesterdayTime().Format(time.RFC3339), 1000, true, "")
 	//	if err != nil {
 	//		fmt.Println(err.Message())

@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"io"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -60,4 +61,18 @@ func MD5strings(data ...string) string {
 	}
 
 	return hex.EncodeToString(md.Sum(nil))
+}
+
+func FloatToString(input_num float64) string {
+	// to convert a float number to a string
+	ret_str := strconv.FormatFloat(input_num, 'f', 6, 64)
+	for {
+		last := len(ret_str) - 1
+		if last >= 0 && ret_str[last] == '0' {
+			ret_str = ret_str[:last]
+		} else {
+			break
+		}
+	}
+	return ret_str
 }

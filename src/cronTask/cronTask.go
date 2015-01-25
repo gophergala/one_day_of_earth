@@ -4,6 +4,7 @@ import (
 	"config"
 	"fmt"
 	"lib"
+	"mongodatabase"
 	"strconv"
 	"time"
 )
@@ -39,39 +40,62 @@ func RunCronTask(task_type int, lat, lng, date, distance string) (cerr *lib.CErr
 
 func StartCron(sleep_seconds int) {
 	for {
-		var err *lib.CError
-		err = RunCronTask(config.TWITTER_CRON, "37.7624499", "-122.4602593", lib.YesterdayTime().Format("2006-01-02"), "1000")
-
-		if err != nil {
-			fmt.Println(err.Message())
-		} else {
-			fmt.Println("Twitter Done")
+		cities := make([]mongodatabase.CityCollection, 0)
+		m := mongodatabase.Mongo{}
+		m.Connect()
+		found, cerr := m.FindAll(config.CITIES_DB_COLLECTION, map[string]interface{}{}, &cities)
+		if cerr != nil {
+			fmt.Println(cerr.Error())
+			time.Sleep(time.Duration(sleep_seconds) * time.Second)
+			continue
 		}
-
-		err = RunCronTask(config.YOUTUBE_CRON, "37.7624499", "-122.4602593", lib.YesterdayTime().Format(time.RFC3339), "1000")
-
-		if err != nil {
-			fmt.Println(err.Message())
-		} else {
-			fmt.Println("Youtube Done")
+		if !found {
+			fmt.Println("No Cities Found")
+			time.Sleep(time.Duration(sleep_seconds) * time.Second)
+			continue
 		}
+		fmt.Println(len(cities))
+		for _, city := range cities {
+			fmt.Println(city.Name, city.Lat, city.Lng)
+			var err *lib.CError
 
-		err = RunCronTask(config.INSTAGRAM_CRON, "37.7624499", "-122.4602593", strconv.Itoa(lib.YesterdayTime().Second()), "5000")
+			go func() {
+				err = RunCronTask(config.TWITTER_CRON, city.Lat, city.Lng, lib.YesterdayTime().Format("2006-01-02"), "1000")
 
-		if err != nil {
-			fmt.Println(err.Message())
-		} else {
-			fmt.Println("Instagram Done")
+				if err != nil {
+					fmt.Println(err.Message())
+					fmt.Println(city.Lat, city.Lng, "Tweet")
+				}
+			}()
+
+			go func() {
+				err = RunCronTask(config.YOUTUBE_CRON, city.Lat, city.Lng, lib.YesterdayTime().Format(time.RFC3339), "1000")
+
+				if err != nil {
+					fmt.Println(err.Message())
+					fmt.Println(city.Lat, city.Lng, "TYoutue")
+				}
+			}()
+
+			go func() {
+				err = RunCronTask(config.INSTAGRAM_CRON, city.Lat, city.Lng, strconv.Itoa(lib.YesterdayTime().Second()), "5000")
+
+				if err != nil {
+					fmt.Println(err.Message())
+					fmt.Println(city.Lat, city.Lng, "Insta")
+				}
+			}()
+
+			go func() {
+				err = RunCronTask(config.FLICKR_CRON, city.Lat, city.Lng, lib.YesterdayTime().Format("2006-01-02"), "20")
+
+				if err != nil {
+					fmt.Println(err.Message())
+					fmt.Println(city.Lat, city.Lng, "Flick")
+				}
+			}()
+			time.Sleep(10 * time.Second)
 		}
-
-		err = RunCronTask(config.FLICKR_CRON, "37.7624499", "-122.4602593", lib.YesterdayTime().Format("2006-01-02"), "20")
-
-		if err != nil {
-			fmt.Println(err.Message())
-		} else {
-			fmt.Println("Flickr Done")
-		}
-
 		time.Sleep(time.Duration(sleep_seconds) * time.Second)
 	}
 }

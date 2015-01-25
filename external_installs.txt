@@ -4,3 +4,6 @@ go get -u github.com/kurrik/oauth1a
 //For MongoDB
 sudo apt-get install bzr
 go get gopkg.in/mgo.v2
+
+//Rest API SERVER
+go get github.com/ant0ine/go-json-rest/rest

@@ -23,4 +23,10 @@ package config
 //YOUTUBE_CRON   = 1
 //INSTAGRAM_CRON = 2
 //FLICKR_CRON    = 3
+//Collection Names
+//TWITTER_DB_COLLECTION   = "twitter"
+//YOUTUBE_DB_COLLECTION   = "youtube"
+//INSTAGRAM_DB_COLLECTION = "instagram"
+//FLICKR_DB_COLLECTION    = "flickr"
+//CITIES_DB_COLLECTION    = "cities"
 //)

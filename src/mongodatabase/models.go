@@ -38,3 +38,10 @@ type FlickrCollection struct {
 	Images       []APIs.ApiImage
 	CreateDate   time.Time
 }
+
+type CityCollection struct {
+	LocationHash string //MD5 for lat, lng
+	Lat          string
+	Lng          string
+	Name         string //With Country name
+}
