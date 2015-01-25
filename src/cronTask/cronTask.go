@@ -54,48 +54,68 @@ func StartCron(sleep_seconds int) {
 			time.Sleep(time.Duration(sleep_seconds) * time.Second)
 			continue
 		}
-		fmt.Println(len(cities))
-		for _, city := range cities {
-			fmt.Println(city.Name, city.Lat, city.Lng)
-			var err *lib.CError
 
-			go func() {
+		all_done := make(chan bool)
+
+		go func() {
+			for _, city := range cities {
+				var err *lib.CError
 				err = RunCronTask(config.TWITTER_CRON, city.Lat, city.Lng, lib.YesterdayTime().Format("2006-01-02"), "1000")
 
 				if err != nil {
 					fmt.Println(err.Message())
 					fmt.Println(city.Lat, city.Lng, "Tweet")
 				}
-			}()
+				time.Sleep(2 * time.Second)
+			}
+		}()
 
-			go func() {
+		go func() {
+			for _, city := range cities {
+				var err *lib.CError
 				err = RunCronTask(config.YOUTUBE_CRON, city.Lat, city.Lng, lib.YesterdayTime().Format(time.RFC3339), "1000")
 
 				if err != nil {
 					fmt.Println(err.Message())
 					fmt.Println(city.Lat, city.Lng, "TYoutue")
 				}
-			}()
+				time.Sleep(2 * time.Second)
+			}
+		}()
 
-			go func() {
+		go func() {
+			for _, city := range cities {
+				var err *lib.CError
 				err = RunCronTask(config.INSTAGRAM_CRON, city.Lat, city.Lng, strconv.Itoa(lib.YesterdayTime().Second()), "5000")
 
 				if err != nil {
 					fmt.Println(err.Message())
 					fmt.Println(city.Lat, city.Lng, "Insta")
 				}
-			}()
+				time.Sleep(5 * time.Second)
+			}
+		}()
 
-			go func() {
+		go func() {
+			for _, city := range cities {
+				var err *lib.CError
 				err = RunCronTask(config.FLICKR_CRON, city.Lat, city.Lng, lib.YesterdayTime().Format("2006-01-02"), "20")
 
 				if err != nil {
 					fmt.Println(err.Message())
 					fmt.Println(city.Lat, city.Lng, "Flick")
 				}
-			}()
-			time.Sleep(10 * time.Second)
-		}
+				time.Sleep(2 * time.Second)
+			}
+		}()
+
+		<-all_done
+		<-all_done
+		<-all_done
+		<-all_done
+
+		fmt.Println("aaaaaaaa")
+
 		time.Sleep(time.Duration(sleep_seconds) * time.Second)
 	}
 }
