@@ -38,26 +38,25 @@ func RunCronTask(task_type int, lat, lng, date, distance string) (cerr *lib.CErr
 	return
 }
 
-func StartCron(sleep_seconds int) {
-	for {
-		cities := make([]mongodatabase.CityCollection, 0)
-		m := mongodatabase.Mongo{}
-		m.Connect()
-		found, cerr := m.FindAll(config.CITIES_DB_COLLECTION, map[string]interface{}{}, &cities)
-		if cerr != nil {
-			fmt.Println(cerr.Error())
-			time.Sleep(time.Duration(sleep_seconds) * time.Second)
-			continue
-		}
-		if !found {
-			fmt.Println("No Cities Found")
-			time.Sleep(time.Duration(sleep_seconds) * time.Second)
-			continue
-		}
+func StartCron(sleep_seconds int) error {
+	cities := make([]mongodatabase.CityCollection, 0)
+	m := mongodatabase.Mongo{}
+	m.Connect()
+	found, cerr := m.FindAll(config.CITIES_DB_COLLECTION, map[string]interface{}{}, &cities)
+	if cerr != nil {
+		fmt.Println(cerr.Error())
+		time.Sleep(time.Duration(sleep_seconds) * time.Second)
+		return cerr
+	}
+	if !found {
+		fmt.Println("No Cities Found")
+		time.Sleep(time.Duration(sleep_seconds) * time.Second)
+		return nil
+	}
+	m.CloseConnection()
 
-		all_done := make(chan bool)
-
-		go func() {
+	go func() {
+		for {
 			for _, city := range cities {
 				var err *lib.CError
 				err = RunCronTask(config.TWITTER_CRON, city.Lat, city.Lng, lib.YesterdayTime().Format("2006-01-02"), "1000")
@@ -66,11 +65,14 @@ func StartCron(sleep_seconds int) {
 					fmt.Println(err.Message())
 					fmt.Println(city.Lat, city.Lng, "Tweet")
 				}
-				time.Sleep(2 * time.Second)
+				time.Sleep(90 * time.Second)
 			}
-		}()
+		}
 
-		go func() {
+	}()
+
+	go func() {
+		for {
 			for _, city := range cities {
 				var err *lib.CError
 				err = RunCronTask(config.YOUTUBE_CRON, city.Lat, city.Lng, lib.YesterdayTime().Format(time.RFC3339), "1000")
@@ -79,11 +81,13 @@ func StartCron(sleep_seconds int) {
 					fmt.Println(err.Message())
 					fmt.Println(city.Lat, city.Lng, "TYoutue")
 				}
-				time.Sleep(2 * time.Second)
+				time.Sleep(90 * time.Second)
 			}
-		}()
+		}
+	}()
 
-		go func() {
+	go func() {
+		for {
 			for _, city := range cities {
 				var err *lib.CError
 				err = RunCronTask(config.INSTAGRAM_CRON, city.Lat, city.Lng, strconv.Itoa(lib.YesterdayTime().Second()), "5000")
@@ -92,11 +96,13 @@ func StartCron(sleep_seconds int) {
 					fmt.Println(err.Message())
 					fmt.Println(city.Lat, city.Lng, "Insta")
 				}
-				time.Sleep(5 * time.Second)
+				time.Sleep(90 * time.Second)
 			}
-		}()
+		}
+	}()
 
-		go func() {
+	go func() {
+		for {
 			for _, city := range cities {
 				var err *lib.CError
 				err = RunCronTask(config.FLICKR_CRON, city.Lat, city.Lng, lib.YesterdayTime().Format("2006-01-02"), "20")
@@ -105,17 +111,9 @@ func StartCron(sleep_seconds int) {
 					fmt.Println(err.Message())
 					fmt.Println(city.Lat, city.Lng, "Flick")
 				}
-				time.Sleep(2 * time.Second)
+				time.Sleep(90 * time.Second)
 			}
-		}()
-
-		<-all_done
-		<-all_done
-		<-all_done
-		<-all_done
-
-		fmt.Println("aaaaaaaa")
-
-		time.Sleep(time.Duration(sleep_seconds) * time.Second)
-	}
+		}
+	}()
+	return nil
 }
